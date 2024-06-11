@@ -19,17 +19,16 @@ class AssistentThemeModel(models.Model):
 
 
 class ChatMessageModel(MP_Node):
-    theme = models.ForeignKey(to=AssistentThemeModel, null=True, blank=False, on_delete=models.SET_NULL)
+    theme = models.ForeignKey(to=AssistentThemeModel, verbose_name="Тема", null=True, blank=False, on_delete=models.SET_NULL)
 
     is_active = models.BooleanField(verbose_name="Ветка сообщения активна?", default=True)
 
     message = RichTextField(verbose_name="Текст сообщения", null=True, blank=False)
 
-    def delete(self, *args, **kwargs):
-        if self.is_root():
-            raise PermissionDenied('Cannot delete root topic')
+    class Meta:
+        ordering = ['theme']
+        verbose_name = "Дерево сообщений чата"
 
-        super(ChatMessageModel, self).delete()
 
     def __str__(self):
         return self.message or ''
