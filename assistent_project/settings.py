@@ -50,6 +50,9 @@ INSTALLED_APPS = [
     'assistent_app',
     'rest_framework',
     'corsheaders',
+    "treebeard",
+
+
     'authentication',
 ]
 
