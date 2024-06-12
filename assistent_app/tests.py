@@ -8,6 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class ChatCasetTest(TestCase):
     def setUp(self) -> None:
         get = lambda node_id: ChatMessageModel.objects.get(pk=node_id)
@@ -20,8 +21,8 @@ class ChatCasetTest(TestCase):
 
         answer1 = node.add_child(message="Ебаный рот", is_filter_question=True)
 
-        FilterFields.objects.create(chat_message=answer1, field_name="one_filter", choices="choices,bred", message="Бред")
-
+        FilterFields.objects.create(chat_message=answer1, field_name="one_filter", choices="choices,bred",
+                                    message="Бред")
 
         get(node.pk).add_sibling(message="Ответ2 на сообщение1")
 
@@ -31,10 +32,11 @@ class ChatCasetTest(TestCase):
 
     class TestRequest:
         data = {}
+
         def __init__(self, data):
             self.data = data
-    def test_show_list_themes(self):
 
+    def test_show_list_themes(self):
         request = ChatCasetTest.TestRequest({"theme": True})
 
         state = FactoryState.create_chat_option(request)
@@ -61,7 +63,7 @@ class ChatCasetTest(TestCase):
         logger.info("Result state ThemeQuestionList: %s", question_list)
 
         self.assertEqual(len(question_list), 1)
-        self.assertEqual(question_list[0]['answer_text'], "Первое сообщение?")
+        self.assertEqual(question_list['answers'][0]['answer_text'], "Первое сообщение?")
 
     def test_on_select_first_question(self):
         request = ChatCasetTest.TestRequest({"answer_id": 1})
@@ -80,5 +82,3 @@ class ChatCasetTest(TestCase):
         self.assertIsInstance(state, (FilterAnswerAccept,))
 
         logger.info("Answered on selected question: %s", state.result())
-
-

@@ -38,11 +38,13 @@ class ThemeQuestionsList(DecisionAssistentState):
         response_data = []
         for question in questions:
             response_data.append({
-                "answer_id": question.id,
+                "id": question.id,
                 "answer_text": question.message,
             })
 
-        return response_data
+        return {
+            "answers": response_data
+        }
 
 
 class AnswerAcceptState(DecisionAssistentState):
