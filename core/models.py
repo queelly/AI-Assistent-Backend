@@ -1,7 +1,8 @@
 from django.db import models
+from django.contrib.gis.db import models as gis_models
 
 class InvestPlace(models.Model):
-    name = models.CharField() 
+    name = models.CharField()
     preferential_treatment = models.CharField(null=True)
     preferential_treatment_id = models.PositiveIntegerField(null=True)
     preferential_treatment_name = models.CharField(null=True)
@@ -51,7 +52,7 @@ class InvestPlace(models.Model):
     owner_url = models.URLField()
     note = models.TextField()
     class SupplyLinesAvailability(models.TextChoices):
-        YES = "Да", 
+        YES = "Да",
         NO = "Нет",
         ABILITY = "Возможно создание"
     water_supply = models.CharField(choices=SupplyLinesAvailability)
@@ -100,4 +101,40 @@ class InvestPlace(models.Model):
     application_documents = models.TextField(null=True)
     application_url = models.URLField()
     possible_businesses = models.TextField(null=True)
-    
+
+    urban_planning_characteristics_and_limitations = models.TextField(null = True)
+    territorial_planining_documents = models.CharField(null = True) # нет ни одного экземпляра
+    other_informmation = models.TextField(null = True)
+    photos_object_url = models.URLField(max_length=1000, null = True)
+    class AvallabilityMaip(models.TextChoices):
+        YES = "да",
+        NO = "нет"
+    description_benefit = models.TextField(null = True)
+    coordinates = gis_models.PointField(null = True) # нужно проверить, задаётся через django.contib.gis.geos.Point()
+
+class SpecialEconomicsZonesAndTechn(models.Model):
+    object_category = models.CharField(max_length=200)
+    sez = models.CharField(max_length=200, null = True)
+    top = models.CharField(max_length=50, null = True) # нет ни одного экземпляра
+    name_object = models.CharField(max_length=500, null = True)
+    region = models.Charfield(max_length = 50, null = True)
+    municipal_formation = models.CharField(max_length=300, null = True)
+    nearest_city = models.CharField(max_length=70, null = True)
+    number_residents = models.PositiveIntegerField()
+    photos_object_url = models.URLField(max_length=1000, null = True)
+    documents_object_url = models.URLField(max_length=1000, null = True)
+    year_object_formation = models.IntegerField(null = True) # мб есть какой-то тип с годом, чтобы не весь int пихать
+    validation_period_object = models.DateField(null = True) # принимает только 2 значения 10 и 31.12.2054
+    total_area = models.IntegerField(null = True)
+    minimal_rental_price = models.IntegerField(null = True)
+    class Possibility_buying_premises(models.TextChoices):
+        YES = "да",
+        NO = "нет"
+    list_industries = models.TextField(null = True)
+    restrictions_on_types_activities = models.TextField(null = True)
+    infrastructure_and_services = models.TextField(null = True)
+    additional_services_management_company = models.TextField(null = True) # нет ни одного экхемпляра
+    name_admin_object = models.CharField(max_length=500, null = True)
+    address_admin_object = models.CharField(max_length=500, null = True)
+    link_site = documents_object_url = models.URLField(max_length=100, null = True)
+    working_hours = models.TimeField(null = True) # вроде оно, но тут может не быть именно промежутка времени, а только конкретное время
