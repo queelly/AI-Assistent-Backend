@@ -26,7 +26,7 @@ class ChatMessageModel(MP_Node):
 
     message = RichTextField(verbose_name="Текст сообщения", null=True, blank=False)
 
-    is_filter_question = models.BooleanField("Вопрос на фильтрацию товаров", default=True)
+    is_filter_question = models.BooleanField("Вопрос на фильтрацию товаров", default=False)
 
     class Meta:
         ordering = ['theme']
