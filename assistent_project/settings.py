@@ -26,7 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 PROJECT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 
@@ -51,7 +50,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     "treebeard",
-
 
     'authentication',
 ]
@@ -109,7 +107,6 @@ if DATABASE_ENV['default']['ENGINE'] == 'django.db.backends.mysql':
 
 DATABASES = DATABASE_ENV
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -154,3 +151,24 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {
+            "format": "[{levelname}]-[{asctime}]-{module} {message}",
+            "style": "{",
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple"
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+}
