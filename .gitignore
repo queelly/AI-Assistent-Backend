@@ -4,5 +4,7 @@ main.py
 venv/
 static/
 media/
+.idea/
+
 
 __pycache__

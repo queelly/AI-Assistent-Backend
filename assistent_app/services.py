@@ -90,6 +90,8 @@ class FilterAnswerAccept(DecisionAssistentState):
 
         filter_fields = FilterFields.objects.filter(chat_message=self.answer_node)
 
+        parent_answer_id = None
+
         filters = []
 
         for filter in filter_fields:
