@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "treebeard",
     "core",
     'authentication',
+    'chatGPT',
 ]
 
 MIDDLEWARE = [
@@ -89,7 +90,7 @@ WSGI_APPLICATION = 'assistent_project.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASE_ENV = {
-    #когда-нибудь вынесем в ENV переменные или файл, как тут https://docs.djangoproject.com/en/5.0/ref/databases/#postgresql-notes
+    # когда-нибудь вынесем в ENV переменные или файл, как тут https://docs.djangoproject.com/en/5.0/ref/databases/#postgresql-notes
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', "django.db.backends.postgresql"),
         'NAME': "favdeep_database",
