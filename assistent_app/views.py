@@ -21,6 +21,8 @@ class AssistentSerializer(serializers.Serializer):
 # Create your views here.
 class AssistentTreeAPIView(generics.GenericAPIView):
 
+    queryset = ChatMessageModel.objects.all()
+
     serializer_class = AssistentSerializer
 
     def post(self, request, *args, **kwargs):
