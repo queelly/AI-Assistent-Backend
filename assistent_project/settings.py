@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     "treebeard",
-
+    "core",
     'authentication',
 ]
 
@@ -89,13 +89,17 @@ WSGI_APPLICATION = 'assistent_project.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASE_ENV = {
+    #когда-нибудь вынесем в ENV переменные или файл, как тут https://docs.djangoproject.com/en/5.0/ref/databases/#postgresql-notes
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', "django.db.backends.sqlite3"),
-        'NAME': os.getenv('DB_NAME', os.path.join(BASE_DIR, 'db.sqlite3')),
-        'USERNAME': os.getenv('DB_USER', ''),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '3306')
+        'ENGINE': os.getenv('DB_ENGINE', "django.db.backends.postgresql"),
+        'NAME': "favdeep_database",
+        'USER': "favdeep_database_user",
+        'PASSWORD': "WozGFnbtNYYiubUfbcuBLhuoNZYr7YVl",
+        'HOST': "dpg-cpir66kf7o1s73blgq70-a.frankfurt-postgres.render.com",
+        'PORT': 5432,
+        'OPTIONS': {
+            'sslmode': 'require',  # устанавливаем режим SSL
+        }
     }
 }
 
