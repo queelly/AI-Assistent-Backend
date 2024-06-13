@@ -95,8 +95,8 @@ class InvestPlace(models.Model):
     electricity_facilities_note = models.TextField(null=True)
     electricity_throughput = models.FloatField(null=True)
     heat_supply = models.FloatField(choices=SupplyLinesAvailability)
-    heat_cost = models.FloatField(null=True)  # у них указано "от .. до", поэтому char field
-    heat_cost_transportation = models.FloatField(null=True)
+    heat_cost = models.CharField(null=True)  # у них указано "от .. до", поэтому char field
+    heat_cost_transportation = models.CharField(null=True)
     heat_facilities_max_power = models.FloatField(null=True)
     heat_facilities_free_power = models.FloatField(null=True)
     heat_facilities_note = models.TextField(null=True)
@@ -115,13 +115,14 @@ class InvestPlace(models.Model):
 
     urban_planning_characteristics_and_limitations = models.TextField(null=True)
     territorial_planining_documents = models.CharField(null=True)  # нет ни одного экземпляра
-    other_informmation = models.TextField(null=True)
-    photos_object_url = models.URLField(max_length=1000, null=True)
+    other_information = models.TextField(null=True)
+    photos_object_url = models.TextField(max_length=1000, null=True)
 
-    class AvallabilityMaip(models.TextChoices):
-        YES = "да",
-        NO = "нет"
+    class AvailabilityMaip(models.TextChoices):
+        YES = "Да"
+        NO = "Нет"
 
+    availability_maip = models.CharField(choices=AvailabilityMaip)
     description_benefit = models.TextField(null=True)
     coordinates = gis_models.PointField(null=True)  # нужно проверить, задаётся через django.contib.gis.geos.Point()
 
@@ -130,8 +131,8 @@ class SpecialEconomicsZonesAndTechn(models.Model):
     object_category = models.CharField(max_length=200)
     sez = models.CharField(max_length=200, null=True)
     top = models.CharField(max_length=50, null=True)  # нет ни одного экземпляра
-    name_object = models.CharField(max_length=500, null=True)
-    region = models.Charfield(max_length=50, null=True)
+    name = models.CharField(max_length=500, null=True)
+    region = models.CharField(max_length=50, null=True)
     municipal_formation = models.CharField(max_length=300, null=True)
     nearest_city = models.CharField(max_length=70, null=True)
     number_residents = models.PositiveIntegerField()
@@ -146,6 +147,7 @@ class SpecialEconomicsZonesAndTechn(models.Model):
         YES = "да",
         NO = "нет"
 
+    possibility_buying_premises = models.CharField(choices=Possibility_buying_premises)
     list_industries = models.TextField(null=True)
     restrictions_on_types_activities = models.TextField(null=True)
     infrastructure_and_services = models.TextField(null=True)
@@ -153,27 +155,28 @@ class SpecialEconomicsZonesAndTechn(models.Model):
     name_admin_object = models.CharField(max_length=500, null=True)
     address_admin_object = models.CharField(max_length=500, null=True)
     link_site = documents_object_url = models.URLField(max_length=100, null=True)
-    working_hours = models.TimeField(
+    working_hours = models.CharField(
         null=True)  # вроде оно, но тут может не быть именно промежутка времени, а только конкретное время
     income_tax = models.CharField(max_length=100)  # Короче там процент % поэтому чар
     property_tax = models.CharField(max_length=100, null=True)  # Процент в экселе !!!
     land_tax = models.CharField(max_length=100, null=True)  # потом расписывется после процента за что
     transport_tax = models.CharField(max_length=100, null=True)
     insurance_premiums = models.CharField(max_length=100, null=True)
-    other_benefits = models.CharField(max_length=500, null=True)
+    other_benefits = models.TextField(max_length=500, null=True)
 
     class Availability_of_a_free_customs_zone(models.TextChoices):
         YES = "да",
         NO = "нет"  # Ответ да / нет однако есть в верхнем регистре
 
-    how_to_become_a_residents = models.CharField(max_length=500, null=True)
+    availability_of_a_free_customs_zone = models.CharField(choices=Availability_of_a_free_customs_zone)
+    how_to_become_a_residents = models.TextField(max_length=500, null=True)
     minimum_investment_amount = models.CharField(max_length=200, null=True)
     coordinates = gis_models.PointField(null=True)
 
 
 class RegionalSupportsMeasures(models.Model):
     region = models.CharField(max_length=30, null=True)  # Вообще всегда Москва
-    name_of_support = models.CharField(max_length=200, null=True)
+    name = models.CharField(max_length=200, null=True)
     support_level = models.CharField(max_length=200, null=True)  # Всегда написано региональный
     main_idea = models.CharField(max_length=1000, null=True)
     npa_requisite = models.CharField(max_length=1000, null=True)  # В том которого нет, написано "нет"
@@ -186,10 +189,11 @@ class RegionalSupportsMeasures(models.Model):
     okved = models.CharField(max_length=2000, null=True)
     restrictions_on_type_of_activities = models.CharField(max_length=2000, null=True)
 
-    class required_entry_into_sme(models.TextChoices):
+    class Required_entry_into_sme(models.TextChoices):
         YES = "Да",
         NO = "Нет"
 
+    required_entry_into_sme = models.CharField(choices=Required_entry_into_sme)
     requirements_for_the_applicant = models.CharField(max_length=1000, null=True)
     application_procedure = models.CharField(max_length=1000, null=True)
     required_documents = models.CharField(max_length=1000, null=True)
