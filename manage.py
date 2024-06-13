@@ -4,7 +4,9 @@ import os
 import sys
 
 
+
 def main():
+    
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'assistent_project.settings')
     try:
@@ -16,6 +18,8 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     execute_from_command_line(sys.argv)
+    # from exceltransfer import start_transfer
+    # start_transfer() - это нужно было для экспорта из excel
 
 
 if __name__ == '__main__':

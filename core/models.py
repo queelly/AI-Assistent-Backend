@@ -10,6 +10,7 @@ class InvestPlace(models.Model):
     support_object_id = models.PositiveIntegerField(null=True)
     support_object_name = models.CharField(null=True, max_length=255)
     region = models.CharField(max_length=255)
+    municipality = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     nearest_city = models.CharField(max_length=255)
 
@@ -40,7 +41,7 @@ class InvestPlace(models.Model):
         RENT = "Аренда"
 
     trade_type = models.CharField(choices=TradeType, max_length=255)
-    price = models.FloatField()
+    price = models.FloatField(null=True) #трындец, даже в этом не уверены
     year_price_ga = models.FloatField(null=True)
     year_price_m2 = models.FloatField(null=True)
     rent_time_constraits = models.CharField(null=True, max_length=255)
@@ -50,15 +51,15 @@ class InvestPlace(models.Model):
     free_land_ga = models.FloatField(null=True)
     cadastral_number_land = models.CharField(null=True, max_length=255)
     allowed_buisnesses = models.TextField(null=True, max_length=1023)
-    surveying = models.BooleanField(null=True)
+    surveying = models.BooleanField(null=True, verbose_name="Межевание ЗУ") #межевание
     land_category = models.CharField(null=True, max_length=255)
     free_room_m2 = models.FloatField(null=True)
     cadastral_number_room = models.CharField(null=True, max_length=255)
     tech_building_characteristics = models.TextField(null=True)
     owner_name = models.CharField(max_length=255)
-    owner_inn = models.PositiveIntegerField()
-    owner_url = models.URLField()
-    note = models.TextField()
+    owner_inn = models.CharField(max_length=12, null=True)
+    owner_url = models.URLField(null=True)
+    note = models.TextField(null=True)
 
     class SupplyLinesAvailability(models.TextChoices):
         YES = "Да",
@@ -66,15 +67,15 @@ class InvestPlace(models.Model):
         ABILITY = "Возможно создание"
 
     water_supply = models.CharField(choices=SupplyLinesAvailability, max_length=255)
-    water_cost = models.FloatField(null=True)
-    water_cost_transportation = models.FloatField(null=True)
+    water_cost = models.CharField(null=True) #тоже char пока
+    water_cost_transportation = models.CharField(null=True)
     water_facilities_max_power = models.FloatField(null=True)
     water_facilities_free_power = models.FloatField(null=True)
     water_facilities_note = models.TextField(null=True)
     water_throughput = models.FloatField(null=True)
     sewage_supply = models.CharField(choices=SupplyLinesAvailability, max_length=255)
-    sewage_cost = models.FloatField(null=True)
-    sewage_cost_transportation = models.FloatField(null=True)
+    sewage_cost = models.CharField(null=True) #float
+    sewage_cost_transportation = models.CharField(null=True)
     sewage_facilities_max_power = models.FloatField(null=True)
     sewage_facilities_free_power = models.FloatField(null=True)
     sewage_facilities_note = models.TextField(null=True)
@@ -93,7 +94,7 @@ class InvestPlace(models.Model):
     electricity_facilities_free_power = models.FloatField(null=True)
     electricity_facilities_note = models.TextField(null=True)
     electricity_throughput = models.FloatField(null=True)
-    heat_supply = models.FloatField(choices=SupplyLinesAvailability, max_length=255)
+    heat_supply = models.CharField(choices=SupplyLinesAvailability, max_length=255)
     heat_cost = models.CharField(null=True, max_length=255)  # у них указано "от .. до", поэтому char field
     heat_cost_transportation = models.CharField(null=True, max_length=255)
     heat_facilities_max_power = models.FloatField(null=True)
@@ -139,9 +140,9 @@ class SpecialEconomicsZonesAndTechn(models.Model):
     photos_object_url = models.URLField(max_length=1000, null=True)
     documents_object_url = models.URLField(max_length=1000, null=True)
     year_object_formation = models.IntegerField(null=True)  # мб есть какой-то тип с годом, чтобы не весь int пихать
-    validation_period_object = models.DateField(null=True)  # принимает только 2 значения 10 и 31.12.2054
-    total_area = models.IntegerField(null=True)
-    minimal_rental_price = models.IntegerField(null=True)
+    validation_period_object = models.CharField(max_length=255, null=True)  # принимает только 2 значения 10 и 31.12.2054
+    total_area = models.FloatField(null=True)
+    minimal_rental_price = models.FloatField(null=True)
 
     class Possibility_buying_premises(models.TextChoices):
         YES = "да",
@@ -176,17 +177,18 @@ class SpecialEconomicsZonesAndTechn(models.Model):
 
 class RegionalSupportsMeasures(models.Model):
     region = models.CharField(max_length=30, null=True)  # Вообще всегда Москва
-    name = models.CharField(max_length=200, null=True)
-    support_level = models.CharField(max_length=200, null=True)  # Всегда написано региональный
-    main_idea = models.CharField(max_length=1000, null=True)
-    npa_requisite = models.CharField(max_length=1000, null=True)  # В том которого нет, написано "нет"
+    name = models.CharField(max_length=255, null=True)
+    support_type = models.CharField(max_length=255, null=True)
+    support_level = models.CharField(max_length=255, null=True)  # Всегда написано региональный
+    main_idea = models.CharField(max_length=2000, null=True)
+    npa_requisite = models.CharField(max_length=2000, null=True)  # В том которого нет, написано "нет"
     npa_url = models.URLField(max_length=1000, null=True)  # Одного нет
     npa_download_url = models.URLField(max_length=1000, null=True)  # Одного нет
     application_form_link = models.URLField(max_length=1000, null=True)
-    name_of_the_responsible_authority = models.CharField(max_length=200, null=True)
+    name_of_the_responsible_authority = models.CharField(max_length=1000, null=True)
     min_investment_volume = models.CharField(max_length=100,
                                              null=True)  # Нет ни одного элемента пока поставил чар, но судя по названию должно быть float
-    okved = models.CharField(max_length=2000, null=True)
+    okved = models.CharField(max_length=16000, null=True)
     restrictions_on_type_of_activities = models.CharField(max_length=2000, null=True)
 
     class Required_entry_into_sme(models.TextChoices):
@@ -194,6 +196,6 @@ class RegionalSupportsMeasures(models.Model):
         NO = "Нет"
 
     required_entry_into_sme = models.CharField(choices=Required_entry_into_sme, max_length=255)
-    requirements_for_the_applicant = models.CharField(max_length=1000, null=True)
-    application_procedure = models.CharField(max_length=1000, null=True)
-    required_documents = models.CharField(max_length=1000, null=True)
+    requirements_for_the_applicant = models.CharField(max_length=8000, null=True)
+    application_procedure = models.CharField(max_length=4000, null=True)
+    required_documents = models.CharField(max_length=16000, null=True)
