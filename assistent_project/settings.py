@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'assistent_app',
     'rest_framework',
+    'drf_spectacular',
     'corsheaders',
     "treebeard",
     "core",
@@ -115,9 +116,16 @@ DATABASES = DATABASE_ENV
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
-
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Django5 Test Swagger API',
+    'DESCRIPTION': 'Django5 Test Swagger API description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
