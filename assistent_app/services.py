@@ -110,6 +110,7 @@ class FilterAnswerAccept(DecisionAssistentState):
                 parent_answer_id = question.get_parent().id
 
         return {
+            "send_id": self.answer_node.filter_model.id,
             "parent_answer_id": parent_answer_id,
             "filters": filters
         }
