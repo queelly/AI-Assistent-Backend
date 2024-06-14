@@ -86,9 +86,12 @@ class FilterAnswerAccept(DecisionAssistentState):
         if not self.answer_node or not self.answer_node.is_filter_question:
             raise ValidationError('Не найден ответ на данный вопрос')
 
+        if not self.answer_node.filter_model:
+            raise ValidationError('filter model')
+
         question = self.answer_node.get_parent()
 
-        filter_fields = FilterFields.objects.filter(chat_message=self.answer_node)
+        filter_fields = FilterFields.objects.filter(model_class=self.answer_node.filter_model)
 
         parent_answer_id = None
 
