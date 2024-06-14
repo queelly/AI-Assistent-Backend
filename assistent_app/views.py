@@ -19,7 +19,7 @@ class AssistentSerializer(serializers.Serializer):
 
 
 class FilterSuggestionSerializer(serializers.Serializer):
-    send_id = serializers.PrimaryKeyRelatedField(queryset=FilterConfig.objects.all(), required=True,label="id вопроса")
+    send_id = serializers.PrimaryKeyRelatedField(queryset=FilterConfig.objects.all(), required=True, label="id вопроса")
     filters = serializers.JSONField(label="Фильтры", required=True)
 
     class Meta:
@@ -45,5 +45,5 @@ class FilterSuggestion(generics.GenericAPIView):
     serializer_class = FilterSuggestionSerializer
 
     def post(self, request, *args, **kwargs):
-        #TODO: фильтрация...
-        pass
+        serializer = self.get_serializer()
+
