@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from rest_framework.request import Request
 
-from assistent_app.models import AssistentThemeModel, ChatMessageModel, FilterFields
+from assistent_app.models import AssistentThemeModel, ChatMessageModel, FilterFields, FilterConfig
 from assistent_app.services import FactoryState, ThemeList, ThemeQuestionsList, AnswerAcceptState, FilterAnswerAccept
 
 import logging
