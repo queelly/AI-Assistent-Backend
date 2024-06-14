@@ -19,9 +19,8 @@ class AssistentSerializer(serializers.Serializer):
 
 
 class FilterSuggestionSerializer(serializers.Serializer):
-    send_id = serializers.PrimaryKeyRelatedField(queryset=FilterConfig.objects.all(), null=True, blank=True,
-                                                 label="id вопроса")
-    filters = serializers.JSONField(label="Фильтры")
+    send_id = serializers.PrimaryKeyRelatedField(queryset=FilterConfig.objects.all(), required=True,label="id вопроса")
+    filters = serializers.JSONField(label="Фильтры", required=True)
 
     class Meta:
         fields = ['send_id', 'filters']
