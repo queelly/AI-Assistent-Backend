@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from rest_framework.request import Request
 
@@ -5,6 +7,9 @@ from assistent_app.models import AssistentThemeModel, ChatMessageModel, FilterFi
 from assistent_app.services import FactoryState, ThemeList, ThemeQuestionsList, AnswerAcceptState, FilterAnswerAccept
 
 import logging
+
+from assistent_app.views import FilterSuggestionSerializer
+from core.models import InvestPlace
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +26,9 @@ class ChatCasetTest(TestCase):
 
         answer1 = node.add_child(message="Ебаный рот", is_filter_question=True)
 
-        FilterFields.objects.create(chat_message=answer1, field_name="one_filter", choices="choices,bred",
+        filter_config = FilterConfig.objects.create(model_class=AssistentThemeModel)
+
+        FilterFields.objects.create(model_class=filter_config, field_name="one_filter", choices="choices,bred",
                                     message="Бред")
 
         get(node.pk).add_sibling(message="Ответ2 на сообщение1")

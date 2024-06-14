@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import generics, serializers
+from rest_framework import generics, serializers, decorators
 from rest_framework.response import Response
 
-from assistent_app.models import AssistentThemeModel, ChatMessageModel, FilterConfig
+from assistent_app.models import AssistentThemeModel, ChatMessageModel, FilterConfig, FilterFields
 from assistent_app.services import FactoryState
 from authentication import serializer
 
@@ -19,7 +19,7 @@ class AssistentSerializer(serializers.Serializer):
 
 
 class FilterSuggestionSerializer(serializers.Serializer):
-    send_id = serializers.PrimaryKeyRelatedField(queryset=FilterConfig.objects.all(), required=True, label="id вопроса")
+    config = serializers.PrimaryKeyRelatedField(queryset=FilterConfig.objects.all(), required=True, label="id вопроса")
     filters = serializers.JSONField(label="Фильтры", required=True)
 
     class Meta:
@@ -40,10 +40,22 @@ class AssistentTreeAPIView(generics.GenericAPIView):
         return Response(data=result, status=200)
 
 
+
 class FilterSuggestion(generics.GenericAPIView):
     queryset = FilterConfig.objects.all()
     serializer_class = FilterSuggestionSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer()
+        serializer = FilterSuggestionSerializer(data=request.data)
 
+        serializer.is_valid(raise_exception=True)
+
+        model_class = serializer.validated_data['config'].get_model_class()
+
+        filterset = serializer.validated_data.get('filters', {})
+
+        items = model_class.objects.filter(**filterset)
+
+        print(items)
+
+        return Response(data=items, status=200)

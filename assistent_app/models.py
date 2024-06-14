@@ -28,6 +28,9 @@ class FilterConfig(models.Model):
     def __str__(self):
         return self.model_class.name
 
+    def get_model_class(self):
+        return self.model_class.model_class()
+
 
 class FilterFields(models.Model):
     model_class = models.ForeignKey(FilterConfig, verbose_name="Модель фильтрации", null=True, blank=False,
@@ -43,6 +46,7 @@ class FilterFields(models.Model):
 
     class Meta:
         verbose_name = "Фильтрация"
+
 
 
 class ChatMessageModel(MP_Node):
