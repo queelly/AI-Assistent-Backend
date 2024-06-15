@@ -1,21 +1,12 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import generics, serializers, decorators
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from assistent_app.models import AssistentThemeModel, ChatMessageModel, FilterConfig, FilterFields
-from assistent_app.services import FactoryState
+from assistent_app.serializers import *
+from assistent_app.services import FactoryState, ShowAvailableFilters, ShowAvailableChoices, ApplyFilter
 from authentication import serializer
-
-
-class AssistentSerializer(serializers.Serializer):
-    theme = serializers.BooleanField(label="Показывать темы", required=False)
-
-    theme_id = serializers.IntegerField(label="Выбранная тема", required=False)
-
-    answer_id = serializers.IntegerField(label="Выбранный ответ", required=False)
-
-    class Meta:
-        fields = ['theme', 'theme_id', 'answer_id']
 
 
 class FilterSuggestionSerializer(serializers.Serializer):
@@ -28,6 +19,7 @@ class FilterSuggestionSerializer(serializers.Serializer):
 
 # Create your views here.
 class AssistentTreeAPIView(generics.GenericAPIView):
+    '''Чат по дереву'''
     queryset = ChatMessageModel.objects.all()
 
     serializer_class = AssistentSerializer
@@ -40,22 +32,57 @@ class AssistentTreeAPIView(generics.GenericAPIView):
         return Response(data=result, status=200)
 
 
+class FetchFilterAPIView(GenericAPIView):
+    '''Получить доступные поля фильтрации'''
+    queryset = ChatMessageModel.objects.all()
 
-class FilterSuggestion(generics.GenericAPIView):
-    queryset = FilterConfig.objects.all()
-    serializer_class = FilterSuggestionSerializer
+    serializer_class = FetchFilterSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = FilterSuggestionSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
 
         serializer.is_valid(raise_exception=True)
 
-        model_class = serializer.validated_data['config'].get_model_class()
+        data = ShowAvailableFilters.get_available_filters(
+            answer=serializer.validated_data['answer'],
+            prev_filters=serializer.validated_data['prev_filters']
+        )
 
-        filterset = serializer.validated_data.get('filters', {})
+        return Response(status=200, data=data)
 
-        items = model_class.objects.filter(**filterset)
 
-        print(items)
+class FetchChooseFilterAPIView(GenericAPIView):
+    '''Получить пункты выбора для фильтра'''
+    queryset = ChatMessageModel.objects.all()
+    serializer_class = FetchChoiceSerializer
 
-        return Response(data=items, status=200)
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        data = ShowAvailableChoices.get_available_choices(
+            answer=serializer.validated_data['answer'],
+            prev_filters=serializer.validated_data['prev_filters'],
+            filter_name=serializer.validated_data['filter_name']
+        )
+
+        return data
+
+
+class ApplyFilterAPIView(GenericAPIView):
+    queryset = ChatMessageModel.objects.all()
+    serializer_class = ApplyFilterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        qs = ApplyFilter.filter(
+            answer=serializer.validated_data['answer'],
+            filters=serializer.validated_data['filters'],
+        )
+
+        return Response(data={
+            "count": qs.count(),
+            "top_10": qs[:10]
+        }, status=200)
