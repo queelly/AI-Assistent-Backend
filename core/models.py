@@ -1,10 +1,35 @@
+from abc import ABC
+
 from django.db import models
+from django.db.models import Q
+from django_filters import FilterSet
+from django_filters import  filters
+from core.choices import PlaceType, InvestingFieldType, OwnreshipType, TradeType, Possibility_buying_premises, \
+    Availability_of_a_free_customs_zone
+
+
+class InvestPlaceFilter(FilterSet):
+    support_object_type = filters.ChoiceFilter(label='Отбор по типу поддержки',
+                                               choices=(("Технопарк", "Технопарк"),
+                                                        ("Без льгот", "Без льгот")))
+
+    preferential_treatment_type = filters.BooleanFilter(label="Преференции инвестиционного положения",
+                                                        method='filter_preferential')
+    trade_type = filters.ChoiceFilter(label="Тип сделки", choices=TradeType)
+
+    ownership = filters.ChoiceFilter(label="Право собственности", choices=OwnreshipType)
+
+    place_type = filters.ChoiceFilter(label="Тип места", choices=PlaceType)
+
+    class Meta:
+        fields = ['support_object_type', 'preferential_treatment_type', 'trade_type', 'ownership',
+                  'place_type']
 
 
 class InvestPlace(models.Model):
     name = models.CharField(max_length=255)
     preferential_treatment = models.CharField(null=True, max_length=255)
-    preferential_treatment_id = models.PositiveIntegerField(null=True)
+    preferential_treatment_id = models.PositiveIntegerField(null=True)  #as boolean field  check is_null ..
     preferential_treatment_name = models.CharField(null=True, max_length=255)
     support_object_type = models.CharField(null=True, max_length=255)
     support_object_id = models.PositiveIntegerField(null=True)
@@ -14,31 +39,16 @@ class InvestPlace(models.Model):
     address = models.CharField(max_length=255)
     nearest_city = models.CharField(max_length=255)
 
-    class PlaceType(models.TextChoices):
-        FIELD = "Земельный участок"
-        ROOM = "Помещение"
+
 
     place_type = models.CharField(choices=PlaceType, max_length=255)
 
-    class InvestingFieldType(models.TextChoices):
-        GREENFIELD = "Гринфилд"
-        BROWNFIELD = "Браунфилд"
 
     novelty_type = models.CharField(choices=InvestingFieldType, max_length=255)
 
-    class OwnreshipType(models.TextChoices):
-        PRIVATE = "Частная"
-        GOV = "Государственная до разграничения"
-        CITY = "Муниципальная"
-        REGION = "Региональная"
 
     ownership = models.CharField(choices=OwnreshipType, max_length=255)
 
-    class TradeType(models.TextChoices):
-        AUCTION_SALE = "Продажа через аукцион"
-        AUCTION_RENT = "Аренда через аукцион"
-        SALE = "Продажа"
-        RENT = "Аренда"
 
     trade_type = models.CharField(choices=TradeType, max_length=255)
     price = models.FloatField(null=True) #трындец, даже в этом не уверены
@@ -127,6 +137,15 @@ class InvestPlace(models.Model):
     coordinates = models.CharField(null=True, max_length=255)  # нужно проверить, задаётся через django.contib.gis.geos.Point()
     #требует gdal который не устанавливается и всё это в django.contrib, поэтому заменил на charfield
 
+    def __str__(self):
+        return self.name or ''
+
+
+    filter_class = InvestPlaceFilter
+
+
+
+
 
 class SpecialEconomicsZonesAndTechn(models.Model):
     object_category = models.CharField(max_length=200)
@@ -144,9 +163,6 @@ class SpecialEconomicsZonesAndTechn(models.Model):
     total_area = models.FloatField(null=True)
     minimal_rental_price = models.FloatField(null=True)
 
-    class Possibility_buying_premises(models.TextChoices):
-        YES = "да",
-        NO = "нет"
 
     possibility_buying_premises = models.CharField(choices=Possibility_buying_premises, max_length=255)
     list_industries = models.TextField(null=True)
@@ -165,14 +181,17 @@ class SpecialEconomicsZonesAndTechn(models.Model):
     insurance_premiums = models.CharField(max_length=100, null=True)
     other_benefits = models.TextField(max_length=500, null=True)
 
-    class Availability_of_a_free_customs_zone(models.TextChoices):
-        YES = "да",
-        NO = "нет"  # Ответ да / нет однако есть в верхнем регистре
 
     availability_of_a_free_customs_zone = models.CharField(choices=Availability_of_a_free_customs_zone, max_length=255)
     how_to_become_a_residents = models.TextField(max_length=500, null=True)
     minimum_investment_amount = models.CharField(max_length=200, null=True)
     coordinates = models.CharField(null=True, max_length=255) #аналогично изменил на charField, так как плохая зависимость
+
+    class Meta:
+        verbose_name = "Специальные экономические зоны?"
+
+    def __str__(self):
+        return self.name or ''
 
 
 class RegionalSupportsMeasures(models.Model):
@@ -199,3 +218,7 @@ class RegionalSupportsMeasures(models.Model):
     requirements_for_the_applicant = models.CharField(max_length=8000, null=True)
     application_procedure = models.CharField(max_length=4000, null=True)
     required_documents = models.CharField(max_length=16000, null=True)
+
+
+    def __str__(self):
+        return self.name or ''

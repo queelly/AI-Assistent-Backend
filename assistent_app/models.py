@@ -4,6 +4,8 @@ from django.db import models
 from rest_framework.exceptions import PermissionDenied
 from treebeard.mp_tree import MP_Node
 
+from core.models import InvestPlaceFilter
+
 
 # Create your models here.
 
@@ -31,14 +33,35 @@ class FilterConfig(models.Model):
     def get_model_class(self):
         return self.model_class.model_class()
 
+    #Получить имена фильтров
+    def get_available_filters(self, prev_filter={}):
+        filters = self.get_model_class().filter_class.get_filters()
+
+        available_filters = []
+        for filter_name in filters.keys():
+            if filter_name not in prev_filter:
+                available_filters.append({
+                    "filter_name": filter_name,
+                    "name": filter_name[filter_name].label
+                })
+
+
+
+        return available_filters
+
+    # Получить пункты выбора для поля
+    def get_availabable_choices(self, filter_name, prev_filter={}):
+        # Мы должны показывать только пункты, которые имееют предложения.
+        if prev_filter:
+            return self.get_model_class().objects.filter(**prev_filter).values_list(filter_name, flat=True).distinct()
+        else:
+            return self.get_model_class().objects.values_list(filter_name, flat=True).distinct()
+
 
 class FilterFields(models.Model):
-    model_class = models.ForeignKey(FilterConfig, verbose_name="Модель фильтрации", null=True, blank=False,
-                                    on_delete=models.CASCADE)
+    config = models.ForeignKey(FilterConfig, verbose_name="Модель фильтрации", null=True, blank=False,
+                               on_delete=models.CASCADE)
     field_name = models.CharField("Поле для фильтрации", max_length=50)
-    many = models.BooleanField("Посылается множетсво значений?", default=False)
-    choices = models.TextField("Пункты для выбора", null=True, blank=True,
-                               help_text='Напишите каждый пункт на новой строке')
     message = RichTextField(verbose_name="Текст сообщения", null=True, blank=True)
 
     def __str__(self):
@@ -47,6 +70,13 @@ class FilterFields(models.Model):
     class Meta:
         verbose_name = "Фильтрация"
 
+    def get_choices(self):
+        model_class = self.config.get_model_class()
+        filterset = model_class.filter_class.get_filters()
+
+        choices = filterset[self.field_name].extra['choices']
+
+        return choices
 
 
 class ChatMessageModel(MP_Node):

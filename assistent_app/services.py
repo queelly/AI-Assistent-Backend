@@ -40,6 +40,7 @@ class ThemeQuestionsList(DecisionAssistentState):
             response_data.append({
                 "id": question.id,
                 "answer_text": question.message,
+                "is_filter_question": question.is_filter_question
             })
 
         return {
@@ -89,31 +90,51 @@ class FilterAnswerAccept(DecisionAssistentState):
         if not self.answer_node.filter_model:
             raise ValidationError('filter model')
 
-        question = self.answer_node.get_parent()
+        # question = self.answer_node.get_parent()
+        #
+        # filter_fields = FilterFields.objects.filter(model_class=self.answer_node.filter_model)
+        #
+        # parent_answer_id = None
 
-        filter_fields = FilterFields.objects.filter(model_class=self.answer_node.filter_model)
-
-        parent_answer_id = None
-
-        filters = []
-
-        for filter in filter_fields:
-            filters.append({
-                "field_name": filter.field_name,
-                "many": filter.many,
-                "choices": filter.choices,
-                "message": filter.message
-            })
-
-        if question:
-            if question.get_depth() > 1:  # Проверяем, есть ли родитель у вопроса
-                parent_answer_id = question.get_parent().id
+        count = self.answer_node.filter_model.get_model_class().objects.all().count()
 
         return {
-            "send_id": self.answer_node.filter_model.id,
-            "parent_answer_id": parent_answer_id,
-            "filters": filters
+            "count": count,
+            "answer_id": self.answer_node.id
         }
+
+
+class ShowAvailableFilters:
+    @staticmethod
+    def get_available_filters(answer,prev_filters={}):
+
+        available_filter = answer.filter_model.get_available_filters(prev_filters)
+
+        return available_filter
+
+
+class ShowAvailableChoices:
+    @staticmethod
+    def get_available_choices(answer, filter_name, prev_filters):
+
+        available_choices = answer.filter_model.get_availabable_choices(filter_name,prev_filters)
+
+        return available_choices
+
+
+#Фильтрация
+class ApplyFilter:
+    @staticmethod
+    def filter(answer, filters = {}):
+        model_class = answer.get_model_class()
+        filter_instance = answer.get_model_class().filter_class(data=filters, queryset=model_class.objects.all())
+
+        if not filter_instance.is_valid():
+            print("Error", filters)
+
+        queryset = filter_instance.filter_queryset(queryset=model_class.objects.all())
+
+        return queryset
 
 
 class FactoryState:
@@ -121,24 +142,23 @@ class FactoryState:
     def create_chat_option(request):
         theme = request.data.get("theme", False)
 
-        #Запрос тем
+        # Запрос тем
         if theme:
             return ThemeList()
 
         theme_id = request.data.get('theme_id', None)
 
-        #Запрос вопросов
+        # Запрос вопросов
         if theme_id:
             return ThemeQuestionsList(theme=get_object_or_none(AssistentThemeModel, id=theme_id))
 
         answer_id = request.data.get('answer_id', None)
 
-
-        #Обработка ответа
+        # Обработка ответа
         if answer_id:
             answer = get_object_or_none(ChatMessageModel, id=answer_id)
 
-            #ответ должен ввести к фильтрации какой-то :/
+            # ответ должен ввести к фильтрации какой-то :/
             if answer.is_filter_question:
                 return FilterAnswerAccept(answer)
             else:

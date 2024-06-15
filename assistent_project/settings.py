@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'ckeditor',
     'assistent_app',
     'rest_framework',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     "core",
     'authentication',
     'chatGPT',
+
 ]
 
 MIDDLEWARE = [
