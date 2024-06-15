@@ -117,24 +117,45 @@ class ShowAvailableChoices:
     @staticmethod
     def get_available_choices(answer, filter_name, prev_filters):
 
-        available_choices = answer.filter_model.get_availabable_choices(filter_name,prev_filters)
+        choices= []
 
-        return available_choices
+        if filter_name == 'list_industries':
+            filters = answer.filter_model.get_model_class().filter_class.get_filters()
+
+            for key,value in filters['list_industries'].extra['choices']:
+                choices.append({
+                    "value": value,
+                    "display": key
+                })
+
+
+        else:
+            choices_model = answer.filter_model.get_availabable_choices(filter_name,prev_filters)
+
+            for choice in choices_model:
+                choices.append({
+                    "value": choice,
+                    "display": choice,
+                })
+
+
+        return choices
 
 
 #Фильтрация
 class ApplyFilter:
     @staticmethod
     def filter(answer, filters = {}):
-        model_class = answer.get_model_class()
-        filter_instance = answer.get_model_class().filter_class(data=filters, queryset=model_class.objects.all())
+        model_class = answer.filter_model.get_model_class()
+        filter_instance = answer.filter_model.get_model_class().filter_class(data=filters, queryset=model_class.objects.all())
 
         if not filter_instance.is_valid():
-            print("Error", filters)
+            print("Error", filters,filter_instance.errors)
 
         queryset = filter_instance.filter_queryset(queryset=model_class.objects.all())
 
         return queryset
+
 
 
 class FactoryState:
