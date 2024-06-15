@@ -7,6 +7,7 @@ from assistent_app.models import AssistentThemeModel, ChatMessageModel, FilterCo
 from assistent_app.serializers import *
 from assistent_app.services import FactoryState, ShowAvailableFilters, ShowAvailableChoices, ApplyFilter
 from authentication import serializer
+from core.serializers import get_serializer_for_model
 
 
 class FilterSuggestionSerializer(serializers.Serializer):
@@ -82,7 +83,9 @@ class ApplyFilterAPIView(GenericAPIView):
             filters=serializer.validated_data['filters'],
         )
 
+        model_class = serializer.validated_data['answer'].filter_model.get_model_class()
+
         return Response(data={
             "count": qs.count(),
-            "top_10": qs[:10]
+            "top_10": get_serializer_for_model(model_class)(instance=qs[:10],many=True).data
         }, status=200)
