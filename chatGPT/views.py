@@ -5,7 +5,7 @@ from rest_framework import status
 from .serializer import GptSerializer, GptSerializerFilter
 import requests
 from django.db import connection
-
+from core.models import InvestPlace
 
 
 
@@ -52,6 +52,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
     #     books = Core.objects.filter(published_date__year__gt=2020)
     #     return render(request, 'books/book_list.html', {'books': books})
     def post(self, request, *args, **kwargs):
+        print([field.name for field in InvestPlace._meta.get_fields()])
         serializer = GptSerializerFilter(data=request.data)
         if serializer.is_valid():
             message = request.data.get("message", "Как дела?")
