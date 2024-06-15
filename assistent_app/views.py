@@ -20,7 +20,12 @@ class FilterSuggestionSerializer(serializers.Serializer):
 
 # Create your views here.
 class AssistentTreeAPIView(generics.GenericAPIView):
-    '''Чат по дереву'''
+    '''Диалог по дереву. У нас есть 3 поля и 3 возможных состояния чата.
+    Сначала клиент должен запросить у нас возможные темы, для этого мы передаем один параметр theme со значением true.
+    Когда пользователь выбрал тему, мы должны запросить первые сообщения, для этого мы отдаем одно поле theme_id с id темы.
+    Дальнейшие наши действия зависят от параметря is_filter_question. Если is_filter_question=True, то мы делаем запрос на get_filters,
+    чтобы получить фильтры объекта (см. get_filters, get_choice, apply_filters,
+    иначе на api/ai с параметром answer_id (если он есть) и дальше весь диалог будет основан на answer_id'''
     queryset = ChatMessageModel.objects.all()
 
     serializer_class = AssistentSerializer
