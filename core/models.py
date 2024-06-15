@@ -6,24 +6,7 @@ from django_filters import FilterSet
 from django_filters import  filters
 from core.choices import PlaceType, InvestingFieldType, OwnreshipType, TradeType, Possibility_buying_premises, \
     Availability_of_a_free_customs_zone
-
-
-class InvestPlaceFilter(FilterSet):
-    support_object_type = filters.ChoiceFilter(label='Отбор по типу поддержки',
-                                               choices=(("Технопарк", "Технопарк"),
-                                                        ("Без льгот", "Без льгот")))
-
-    preferential_treatment_type = filters.BooleanFilter(label="Преференции инвестиционного положения",
-                                                        method='filter_preferential')
-    trade_type = filters.ChoiceFilter(label="Тип сделки", choices=TradeType)
-
-    ownership = filters.ChoiceFilter(label="Право собственности", choices=OwnreshipType)
-
-    place_type = filters.ChoiceFilter(label="Тип места", choices=PlaceType)
-
-    class Meta:
-        fields = ['support_object_type', 'preferential_treatment_type', 'trade_type', 'ownership',
-                  'place_type']
+from core.filters import InvestPlaceFilter, SpecialEconomicsFilter
 
 
 class InvestPlace(models.Model):
@@ -140,9 +123,7 @@ class InvestPlace(models.Model):
     def __str__(self):
         return self.name or ''
 
-
     filter_class = InvestPlaceFilter
-
 
 
 
@@ -192,6 +173,8 @@ class SpecialEconomicsZonesAndTechn(models.Model):
 
     def __str__(self):
         return self.name or ''
+
+    filter_class = SpecialEconomicsFilter
 
 
 class RegionalSupportsMeasures(models.Model):

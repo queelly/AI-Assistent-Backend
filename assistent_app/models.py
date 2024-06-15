@@ -4,7 +4,7 @@ from django.db import models
 from rest_framework.exceptions import PermissionDenied
 from treebeard.mp_tree import MP_Node
 
-from core.models import InvestPlaceFilter
+from core.models import InvestPlaceFilter, SpecialEconomicsZonesAndTechn
 
 
 # Create your models here.
@@ -42,7 +42,7 @@ class FilterConfig(models.Model):
             if filter_name not in prev_filter:
                 available_filters.append({
                     "filter_name": filter_name,
-                    "name": filter_name[filter_name].label
+                    "name": filters[filter_name].label
                 })
 
 
@@ -52,10 +52,12 @@ class FilterConfig(models.Model):
     # Получить пункты выбора для поля
     def get_availabable_choices(self, filter_name, prev_filter={}):
         # Мы должны показывать только пункты, которые имееют предложения.
+
         if prev_filter:
             return self.get_model_class().objects.filter(**prev_filter).values_list(filter_name, flat=True).distinct()
         else:
-            return self.get_model_class().objects.values_list(filter_name, flat=True).distinct()
+            return SpecialEconomicsZonesAndTechn.objects.values_list('list_industries').distinct()
+
 
 
 class FilterFields(models.Model):
