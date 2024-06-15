@@ -4,6 +4,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializer import GptSerializer, GptSerializerFilter
 import requests
+from django.db import connection
+
+
+
 
 
 # generic viewset
@@ -43,6 +47,10 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
     serializer_class = GptSerializerFilter
     queryset = None
 
+    # def book_list(request):
+    #     # Извлечение книг, опубликованных после 2020 года
+    #     books = Core.objects.filter(published_date__year__gt=2020)
+    #     return render(request, 'books/book_list.html', {'books': books})
     def post(self, request, *args, **kwargs):
         serializer = GptSerializerFilter(data=request.data)
         if serializer.is_valid():
@@ -110,7 +118,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                                     "Если ни к одной категории не относится,  "
                                     "то напиши <<Извините я не понимаю о чем вы>>. "
                                     "Сам список категорий: Муниципальное образование, Тип площадки, Форма собственности объекта,"
-                                    "Стоимость объекта ,Стоимость руб./год за га, Стоимость, руб./год за га,min и max сроки аренды ,"
+                                    "Стоимость объекта ,Стоимость руб./год за га, Стоимость, руб./год за м.кв.,min и max сроки аренды ,"
                                     "Свободная площадь ЗУ га, Варианты разрешенного использования, Свободная площадь, "
                                     "Водоснабжение Наличие,Водоотведение Наличие,Газоснабжение Наличие,Электроснабжение Наличие,"
                                     "Теплоснабжение Наличие,Вывоз ТКО Наличие,Наличие подъездных путей,Наличие ж/д,Наличие парковки грузового транспорта "
@@ -119,7 +127,21 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                 }
             response = requests.post(url='https://ask.chadgpt.ru/api/public/gpt-3.5', json=request_json)
             if response.status_code == 200:
+                if (category == "Помещения и Сооружения"):
+                    self.get_table_columns("core_investplace")
+                    request_json_2 = {
+                        "message": response,
+                        "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
+                        "history": [
+                            {"role": "system",
+                             "content": "Тебе даны названия колонок в Базе Данных и категории объектов с их значения. Соотнеси и замени название категории на название столбца из таблицы в БД."
+                                        "Вот названия столбцов в таблице: municipality, place_type, ownership, price, year_price_ga, year_price_m2,"
+                                        "rent_time_constraits,free_land_ga, allowed_buisnesses,  "},
+                        ]
+                    }
+                    response2 = requests.post(url='https://ask.chadgpt.ru/api/public/gpt-3.5', json=request_json_2)
                 resp_json = response.json()
+
                 if resp_json['is_success']:
                     return Response({
                         'response': resp_json['response'],
