@@ -282,7 +282,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
         if serializer.is_valid():
             message = request.data.get("message", "Как дела?")
             category = request.data.get("category", "Технопарк")
-            if (category == "Технопарк" or category == "ОЭЗ"):
+            if (category == "4" or category == "4"):
                 request_json = {
                     "message": message,
                     "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
@@ -306,7 +306,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
 
                     ]
                 }
-            if (category == "РМП"):
+            if (category == "5"):
                 request_json = {
                     "message": message,
                     "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
@@ -327,7 +327,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                                     "Выдай как в примере.  Пример: Налог : 0, Наименование объекта: Технополис"},
                     ]
                 }
-            if (category == "Помещения и Сооружения"):
+            if (category == "3"):
                 request_json = {
                     "message": message,
                     "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
@@ -355,7 +355,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
             if response.status_code == 200:
                 resp_json = response.json()
                 if ':' in resp_json['response']:
-                    if (category == "РМП"):
+                    if (category == "5"):
                         if ("Список отраслей" in resp_json['response'].lower()):
                             request_json_2 = {
                                 "message": resp_json['response'],
@@ -374,7 +374,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                             a = a.replace(regional[i], i)
                         result = self.parse_and_search_in_db(a, RegionalSupportsMeasures)
 
-                    if (category == "Технопарк" or category == "ОЭЗ"):
+                    if (category == "4" or category == "4"):
                         if ("Список отраслей" in resp_json['response']):
                             request_json_2 = {
                                 "message": resp_json['response'],
@@ -393,7 +393,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                             b = b.replace(technoparks[i], i)
                         result = self.parse_and_search_in_db(b, SpecialEconomicsZonesAndTechn)
 
-                    if (category == "Помещения и Сооружения"):
+                    if (category == "3"):
                         if ("Список отраслей" in resp_json['response']):
                             request_json_2 = {
                                 "message": resp_json['response'],
