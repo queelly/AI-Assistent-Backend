@@ -124,8 +124,8 @@ class ShowAvailableChoices:
 
             for key,value in filters['list_industries'].extra['choices']:
                 choices.append({
-                    "value": value,
-                    "display": key
+                    "display": value,
+                    "value": key
                 })
 
 

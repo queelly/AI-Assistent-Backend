@@ -11,23 +11,25 @@ from authentication.manager import UserManager
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(verbose_name="Адрес электронной почты", db_index=True, unique=True)
 
-    first_name = models.CharField("Имя", max_length=255, null=True, blank=False)
+    first_name = models.CharField("Имя", max_length=255, blank=False)
 
-    last_name = models.CharField("Фамилия", max_length=255, null=True, blank=False)
+    last_name = models.CharField("Фамилия", max_length=255, blank=False)
 
     patronymic = models.CharField("Отчество", max_length=255, null=True, blank=True)
 
     # по возможности выделить в отдельную таблицу
-    organisation = models.CharField("Наименование организации", max_length=256, null=True, blank=True)
+    organisation = models.CharField("Наименование организации", max_length=255, null=True, blank=True)
 
-    inn = models.CharField("ИНН", max_length=25, null=True, blank=False)
+    organisation_sector = models.CharField("Отрасль деятельности", max_length=255, null=True, blank=True)
+
+    inn = models.CharField("ИНН", max_length=25, blank=False)
 
     weblink = models.URLField("Сайт организации", null=True, blank=False)
 
     # по возможности выделить в отдельную таблицу
-    country = models.CharField("Страна", max_length=128, null=True, blank=True)
+    country = models.CharField("Страна", max_length=128)
 
-    city = models.CharField("Город", max_length=128, null=True, blank=True)
+    city = models.CharField("Город", max_length=128)
 
     work_position = models.CharField("Должность", max_length=128, blank=True, null=True)
 

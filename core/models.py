@@ -3,16 +3,16 @@ from abc import ABC
 from django.db import models
 from django.db.models import Q
 from django_filters import FilterSet
-from django_filters import  filters
+from django_filters import filters
 from core.choices import PlaceType, InvestingFieldType, OwnreshipType, TradeType, Possibility_buying_premises, \
     Availability_of_a_free_customs_zone
-from core.filters import InvestPlaceFilter, SpecialEconomicsFilter
+from core.filters import InvestPlaceFilter, SpecialEconomicsFilter, RegionalSupportsMeasuresFilter
 
 
 class InvestPlace(models.Model):
     name = models.CharField(max_length=255)
     preferential_treatment = models.CharField(null=True, max_length=255)
-    preferential_treatment_id = models.PositiveIntegerField(null=True)  #as boolean field  check is_null ..
+    preferential_treatment_id = models.PositiveIntegerField(null=True)  # as boolean field  check is_null ..
     preferential_treatment_name = models.CharField(null=True, max_length=255)
     support_object_type = models.CharField(null=True, max_length=255)
     support_object_id = models.PositiveIntegerField(null=True)
@@ -22,19 +22,14 @@ class InvestPlace(models.Model):
     address = models.CharField(max_length=255)
     nearest_city = models.CharField(max_length=255)
 
-
-
     place_type = models.CharField(choices=PlaceType, max_length=255)
-
 
     novelty_type = models.CharField(choices=InvestingFieldType, max_length=255)
 
-
     ownership = models.CharField(choices=OwnreshipType, max_length=255)
 
-
     trade_type = models.CharField(choices=TradeType, max_length=255)
-    price = models.FloatField(null=True) #трындец, даже в этом не уверены
+    price = models.FloatField(null=True)  # трындец, даже в этом не уверены
     year_price_ga = models.FloatField(null=True)
     year_price_m2 = models.FloatField(null=True)
     rent_time_constraits = models.CharField(null=True, max_length=255)
@@ -44,7 +39,7 @@ class InvestPlace(models.Model):
     free_land_ga = models.FloatField(null=True)
     cadastral_number_land = models.CharField(null=True, max_length=255)
     allowed_buisnesses = models.TextField(null=True, max_length=1023)
-    surveying = models.BooleanField(null=True, verbose_name="Межевание ЗУ") #межевание
+    surveying = models.BooleanField(null=True, verbose_name="Межевание ЗУ")  # межевание
     land_category = models.CharField(null=True, max_length=255)
     free_room_m2 = models.FloatField(null=True)
     cadastral_number_room = models.CharField(null=True, max_length=255)
@@ -60,14 +55,14 @@ class InvestPlace(models.Model):
         ABILITY = "Возможно создание"
 
     water_supply = models.CharField(choices=SupplyLinesAvailability, max_length=255)
-    water_cost = models.CharField(null=True) #тоже char пока
+    water_cost = models.CharField(null=True)  # тоже char пока
     water_cost_transportation = models.CharField(null=True)
     water_facilities_max_power = models.FloatField(null=True)
     water_facilities_free_power = models.FloatField(null=True)
     water_facilities_note = models.TextField(null=True)
     water_throughput = models.FloatField(null=True)
     sewage_supply = models.CharField(choices=SupplyLinesAvailability, max_length=255)
-    sewage_cost = models.CharField(null=True) #float
+    sewage_cost = models.CharField(null=True)  # float
     sewage_cost_transportation = models.CharField(null=True)
     sewage_facilities_max_power = models.FloatField(null=True)
     sewage_facilities_free_power = models.FloatField(null=True)
@@ -117,15 +112,15 @@ class InvestPlace(models.Model):
 
     availability_maip = models.CharField(choices=AvailabilityMaip, max_length=255)
     description_benefit = models.TextField(null=True)
-    coordinates = models.CharField(null=True, max_length=255)  # нужно проверить, задаётся через django.contib.gis.geos.Point()
-    #требует gdal который не устанавливается и всё это в django.contrib, поэтому заменил на charfield
+    coordinates = models.CharField(null=True,
+                                   max_length=255)  # нужно проверить, задаётся через django.contib.gis.geos.Point()
+
+    # требует gdal который не устанавливается и всё это в django.contrib, поэтому заменил на charfield
 
     def __str__(self):
         return self.name or ''
 
     filter_class = InvestPlaceFilter
-
-
 
 
 class SpecialEconomicsZonesAndTechn(models.Model):
@@ -140,10 +135,10 @@ class SpecialEconomicsZonesAndTechn(models.Model):
     photos_object_url = models.URLField(max_length=1000, null=True)
     documents_object_url = models.URLField(max_length=1000, null=True)
     year_object_formation = models.IntegerField(null=True)  # мб есть какой-то тип с годом, чтобы не весь int пихать
-    validation_period_object = models.CharField(max_length=255, null=True)  # принимает только 2 значения 10 и 31.12.2054
+    validation_period_object = models.CharField(max_length=255,
+                                                null=True)  # принимает только 2 значения 10 и 31.12.2054
     total_area = models.FloatField(null=True)
     minimal_rental_price = models.FloatField(null=True)
-
 
     possibility_buying_premises = models.CharField(choices=Possibility_buying_premises, max_length=255)
     list_industries = models.TextField(null=True)
@@ -154,7 +149,8 @@ class SpecialEconomicsZonesAndTechn(models.Model):
     address_admin_object = models.CharField(max_length=500, null=True)
     link_site = models.URLField(max_length=100, null=True)
     working_hours = models.CharField(
-        null=True, max_length=255)  # вроде оно, но тут может не быть именно промежутка времени, а только конкретное время
+        null=True,
+        max_length=255)  # вроде оно, но тут может не быть именно промежутка времени, а только конкретное время
     income_tax = models.CharField(max_length=100)  # Короче там процент % поэтому чар
     property_tax = models.CharField(max_length=100, null=True)  # Процент в экселе !!!
     land_tax = models.CharField(max_length=100, null=True)  # потом расписывется после процента за что
@@ -162,11 +158,11 @@ class SpecialEconomicsZonesAndTechn(models.Model):
     insurance_premiums = models.CharField(max_length=100, null=True)
     other_benefits = models.TextField(max_length=500, null=True)
 
-
     availability_of_a_free_customs_zone = models.CharField(choices=Availability_of_a_free_customs_zone, max_length=255)
     how_to_become_a_residents = models.TextField(max_length=500, null=True)
     minimum_investment_amount = models.CharField(max_length=200, null=True)
-    coordinates = models.CharField(null=True, max_length=255) #аналогично изменил на charField, так как плохая зависимость
+    coordinates = models.CharField(null=True,
+                                   max_length=255)  # аналогично изменил на charField, так как плохая зависимость
 
     class Meta:
         verbose_name = "Специальные экономические зоны?"
@@ -202,6 +198,7 @@ class RegionalSupportsMeasures(models.Model):
     application_procedure = models.CharField(max_length=4000, null=True)
     required_documents = models.CharField(max_length=16000, null=True)
 
-
     def __str__(self):
         return self.name or ''
+
+    filter_class = RegionalSupportsMeasuresFilter
