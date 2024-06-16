@@ -53,6 +53,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
         search_results = {}
         id_search_result = set()
         for part in data_parts:
+
             key, value = part.split(': ')
             key = key.strip()
             value = value.strip()
@@ -171,7 +172,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                     'application_form_link': 'Ссылка на форму подачи заявки',
                     'name_of_the_responsible_authority': 'Наименование ответственного органа власти, администрирующего данную меру поддержки',
                     'min_investment_volume': 'Минимальный объем инвестиций', 'okved': 'ОКВЭД',
-                    'OKVED': 'ОКВЭД',
+                    'OKVED': 'ОКВЭД', 'OKVED': ' Список отраслей', 'okved': 'Список отраслей',
                     'restrictions_on_type_of_activities': 'Ограничения по видам деятельности',
                     'required_entry_into_sme': 'Требуется вхождение в реестр МСП',
                     'requirements_for_the_applicant': 'Требования к заявителю',
@@ -321,7 +322,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                                     "Если подразумевает, что значение категории, о которой идет речь равна нулю или отсутсвует, то через двоеточие напиши <<0>>"
                                     "Если ни к одной категории не относится,  "
                                     "то напиши <<Извините я не понимаю о чем вы>>. "
-                                    "Сам список категорий: ОКВЭД,"
+                                    "Сам список категорий: Список отраслей,"
                                     "Минимальный объем инвестиций.  "
                                     "Выдай как в примере.  Пример: Налог : 0, Наименование объекта: Технополис"},
                     ]
@@ -352,66 +353,67 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                 }
             response = requests.post(url='https://ask.chadgpt.ru/api/public/gpt-3.5', json=request_json)
             if response.status_code == 200:
-
                 resp_json = response.json()
-                if (category == "РМП"):
+                if ':' in resp_json['response']:
+                    if (category == "РМП"):
+                        if ("Список отраслей" in resp_json['response'].lower()):
+                            request_json_2 = {
+                                "message": resp_json['response'],
+                                "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
+                                "history": [
+                                    {"role": "system",
+                                     "content": "Ты получаешь список отраслей. За каждым названием прикплен номер. Также ты получаешь сообщение пользователя."
+                                                f"Твоя задача заменить сообщение пользователя на номер из списка отраслей о которой идет речь в сообщении пользователя, не меняя при этом остальное! Вот список отраслей:{list_of_industries} "},
+                                ]
+                            }
+                            response2 = requests.post(url='https://ask.chadgpt.ru/api/public/gpt-3.5',
+                                                      json=request_json_2)
+                            resp_json = response2.json()
+                        a = resp_json['response']
+                        for i in regional:
+                            a = a.replace(regional[i], i)
+                        result = self.parse_and_search_in_db(a, RegionalSupportsMeasures)
 
-                    if ("оквэд" in resp_json['response'].lower()):
-                        request_json_2 = {
-                            "message": resp_json['response'],
-                            "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
-                            "history": [
-                                {"role": "system",
-                                 "content": "Ты получаешь список отраслей. За каждым названием прикплен номер ж. Таке ты получаешь сообщение пользователя."
-                                            f"Твоя задача заменить сообщение пользователя на номер из списка отраслей, не меняя при этом остальное! Вот список отраслей:{list_of_industries} "},
-                            ]
-                        }
-                        response2 = requests.post(url='https://ask.chadgpt.ru/api/public/gpt-3.5', json=request_json_2)
-                        resp_json = response2.json()
-                    a = resp_json['response']
-                    for i in regional:
-                        a = a.replace(regional[i], i)
-                    result = self.parse_and_search_in_db(a, RegionalSupportsMeasures)
-                    print(result)
-                if (category == "Технопарк" or category == "ОЭЗ"):
+                    if (category == "Технопарк" or category == "ОЭЗ"):
+                        if ("Список отраслей" in resp_json['response']):
+                            request_json_2 = {
+                                "message": resp_json['response'],
+                                "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
+                                "history": [
+                                    {"role": "system",
+                                     "content": "Ты получаешь список отраслей. За каждым названием прикплен номер этой отрасли. Также ты получаешь сообщение пользователя."
+                                                f"Твоя задача заменить сообщение пользователя на номер из списка отраслей, не меняя при этом остальное! Вот список отраслей:{list_of_industries}"},
+                                ]
+                            }
+                            response2 = requests.post(url='https://ask.chadgpt.ru/api/public/gpt-3.5',
+                                                      json=request_json_2)
+                            resp_json = response2.json()
+                        b = resp_json['response']
+                        for i in technoparks:
+                            b = b.replace(technoparks[i], i)
+                        result = self.parse_and_search_in_db(b, SpecialEconomicsZonesAndTechn)
 
-                    if ("Список отраслей" in resp_json['response']):
-                        request_json_2 = {
-                            "message": resp_json['response'],
-                            "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
-                            "history": [
-                                {"role": "system",
-                                 "content": "Ты получаешь список отраслей. За каждым названием прикплен номер. Также ты получаешь сообщение пользователя."
-                                            f"Твоя задача заменить сообщение пользователя на номер из списка отраслей, не меняя при этом остальное! Вот список отраслей:{list_of_industries}"},
-                            ]
-                        }
-                        response2 = requests.post(url='https://ask.chadgpt.ru/api/public/gpt-3.5',
-                                                  json=request_json_2)
-                        resp_json = response2.json()
-                    b = resp_json['response']
-                    for i in technoparks:
-                        b = b.replace(technoparks[i], i)
-                    result = self.parse_and_search_in_db(b, SpecialEconomicsZonesAndTechn)
-                    print(result)
-                if (category == "Помещения и Сооружения"):
-                    if ("Список отраслей" in resp_json['response']):
-                        request_json_2 = {
-                            "message": resp_json['response'],
-                            "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
-                            "history": [
-                                {"role": "system",
-                                 "content": "Ты получаешь список отраслей. За каждым названием прикплен номер. Также ты получаешь сообщение пользователя."
-                                            f"Твоя задача заменить сообщение пользователя на номер из списка отраслей, не меняя при этом остальное! Вот список отраслей:{list_of_industries}"},
-                            ]
-                        }
-                        response2 = requests.post(url='https://ask.chadgpt.ru/api/public/gpt-3.5', json=request_json_2)
-                        resp_json = response2.json()
-                    c = resp_json['response']
-                    for i in invest_dic:
-                        c = c.replace(invest_dic[i], i)
-
-                    result = self.parse_and_search_in_db(c, InvestPlace)
-                    print(result)
+                    if (category == "Помещения и Сооружения"):
+                        if ("Список отраслей" in resp_json['response']):
+                            request_json_2 = {
+                                "message": resp_json['response'],
+                                "api_key": "chad-c647e5d4d8fa4f0ca5457d4e62f965812ra1iudl",
+                                "history": [
+                                    {"role": "system",
+                                     "content": "Ты получаешь список отраслей. За каждым названием прикплен номер. Также ты получаешь сообщение пользователя."
+                                                f"Твоя задача заменить сообщение пользователя на номер из списка отраслей, не меняя при этом остальное! Вот список отраслей:{list_of_industries}"},
+                                ]
+                            }
+                            response2 = requests.post(url='https://ask.chadgpt.ru/api/public/gpt-3.5',
+                                                      json=request_json_2)
+                            resp_json = response2.json()
+                        c = resp_json['response']
+                        for i in invest_dic:
+                            c = c.replace(invest_dic[i], i)
+                        result = self.parse_and_search_in_db(c, InvestPlace)
+                        print(result)
+                else:
+                    result = resp_json['response']
                 if resp_json['is_success']:
                     return Response({
                         'response': result,
