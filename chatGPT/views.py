@@ -64,10 +64,10 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                     lower_field=Lower(key)
                 ).filter(
                     lower_field__contains=value.lower()
-                ).values_list('id', flat=True)
+                ).values_list('name', flat=True)
                 print(key, value, search_results)
             except Exception as e:
-                search_results = model.objects.filter(**query).values_list('name', key)
+                search_results = model.objects.filter(**query).values_list('name')
             if not id_search_result:
                 id_search_result.update(search_results)
             if id_search_result.intersection(search_results):
