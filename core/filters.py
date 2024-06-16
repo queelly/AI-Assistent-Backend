@@ -33,7 +33,7 @@ class SpecialEconomicsFilter(FilterSet):
         ('Технопарк', 'Технопарк')
     ))
 
-    possibility_buying_premises = filters.ChoiceFilter(label="Возможность покупки недвижемости",
+    possibility_buying_premises = filters.ChoiceFilter(label="Возможность покупки недвижимости",
                                                        choices=(("да", "да"), ('нет', 'нет')))
     list_industries = filters.ChoiceFilter(label="Специализация зоны", lookup_expr='in',
                                            choices=(
