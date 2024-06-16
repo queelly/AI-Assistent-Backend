@@ -56,7 +56,7 @@ class FilterConfig(models.Model):
         if prev_filter:
             return self.get_model_class().objects.filter(**prev_filter).values_list(filter_name, flat=True).distinct()
         else:
-            return SpecialEconomicsZonesAndTechn.objects.values_list(filter_name,flat=True).distinct()
+            return self.get_model_class().objects.values_list(filter_name,flat=True).distinct()
 
 
 
