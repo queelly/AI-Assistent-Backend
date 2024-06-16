@@ -72,6 +72,8 @@ class FetchChooseFilterAPIView(GenericAPIView):
             filter_name=serializer.validated_data['filter_name']
         )
 
+        data['filter_name'] = serializer.validated_data['filter_name']
+
         return Response(data=data,status=200)
 
 
