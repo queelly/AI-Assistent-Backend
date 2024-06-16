@@ -67,7 +67,7 @@ class ChadGPTFiltreCategoryView(GenericAPIView):
                 ).values_list('id', flat=True)
                 print(key, value, search_results)
             except Exception as e:
-                search_results = model.objects.filter(**query).values_list('id', key)
+                search_results = model.objects.filter(**query).values_list('name', key)
             if not id_search_result:
                 id_search_result.update(search_results)
             if id_search_result.intersection(search_results):
