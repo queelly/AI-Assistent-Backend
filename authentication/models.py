@@ -20,6 +20,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     # по возможности выделить в отдельную таблицу
     organisation = models.CharField("Наименование организации", max_length=256, null=True, blank=True)
 
+    organisation_sector = models.CharField("Отрасль деятельности", max_length=255, null=True, blank=True)
+
     inn = models.CharField("ИНН", max_length=25, null=True, blank=False)
 
     weblink = models.URLField("Сайт организации", null=True, blank=False)
